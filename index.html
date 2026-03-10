@@ -1,0 +1,27 @@
+html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CI/CD Pipeline App</title>
+  <style>
+    body{font-family:Arial;margin:50px;}
+    .container{background:#f0f0f0;padding:20px;border-radius:5px;}
+    h1{color:#0078d4;}
+    .info{background:white;padding:15px;margin:10px0;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✅ CI/CD Pipeline is Working!</h1>
+    <div class="info">
+      <p><strong>App Status:</strong>Active</p>
+      <p><strong>Last Updated:</strong><span id="time"></span></p>
+      <p><strong>Environment:</strong>Production</p>
+    </div>
+    <a href="/health"style="color:#0078d4;text-decoration:none;">→ Check Health</a>
+  </div>
+  <script>
+    document.getElementById('time').textContent=newDate().toLocaleString();
+  </script>
+</body>
+</html>
