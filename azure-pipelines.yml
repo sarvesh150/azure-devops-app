@@ -1,42 +1,27 @@
-#yaml
 trigger:
-  -main
+  - main
 
-pool: 
+pool:
   vmImage: 'windows-latest'
 
 stages:
-  -stage: Build
-  displayname:'Build Stage'
+- stage: Build
+  displayName: 'Build Stage'
   jobs:
-  -job: BuildJob
-   displayName: 'Build Job'
-   steps:
-   -task: PowerShell@2
-    displayName: 'Create Web Package'
-    inputs: 
-      targetType: 'inline'
-      script: |
-        # Create output directory
-        New-Item-ItemType Directory -Path"$(Build.ArtifactStagingDirectory)\web" -Force
-
-        #Copy source files
-        Copy-Item-Path "$(Build.SourcesDirectory)\*.html" -Destination"$(Build.ArtifactStagingDirectory)\web\"-Force
-
-        #Create info file with build details
-        @"
-        Build ID: $(Build.BuildId)
-        Build Time:$(System.CollectionUri)
-        commit:$(Build.SourceVersion)
-        "@ | Out-File_Path "$(Build.ArtifactStagingDirectory)\web\build-info.txt"
-
-        Write-Host "Build package created successfully"
-
-   -task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifacts'
-    inputs:
-      pathToPublish: 'Publish Artifacts'
-      inputs: 
+  - job: BuildJob
+    displayName: 'Build Job'
+    steps:
+    - task: PowerShell@2
+      displayName: 'Create Web Package'
+      inputs:
+        targetType: 'inline'
+        script: |
+          New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\web" -Force
+          Copy-Item -Path "$(Build.SourcesDirectory)\*.html" -Destination "$(Build.ArtifactStagingDirectory)\web\" -Force
+          Write-Host "Build package created"
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifacts'
+      inputs:
         pathToPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'drop'
         publishLocation: 'Container'
