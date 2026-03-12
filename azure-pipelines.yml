@@ -28,7 +28,7 @@ stages:
 
 - stage: DeployDev
   displayName: 'Deploy to DEV'
-  dependson: Build 
+  dependsOn: Build 
   condition: succeeded()
   jobs:
     - deployment: DeployDev
