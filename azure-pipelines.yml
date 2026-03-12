@@ -4,24 +4,87 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-stages:
+stages: 
 - stage: Build
   displayName: 'Build Stage'
   jobs:
   - job: BuildJob
     displayName: 'Build Job'
-    steps:
+    steps: 
     - task: PowerShell@2
-      displayName: 'Create Web Package'
+      displayName: 'Cretae Web Package'
       inputs:
         targetType: 'inline'
         script: |
           New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\web" -Force
           Copy-Item -Path "$(Build.SourcesDirectory)\*.html" -Destination "$(Build.ArtifactStagingDirectory)\web\" -Force
           Write-Host "Build package created"
-    - task: PublishBuildArtifacts@1
+    - task: PublishBuildArtifact@1
       displayName: 'Publish Artifacts'
       inputs:
         pathToPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'drop'
         publishLocation: 'Container'
+
+- stage: DeployDev
+  displayName: 'Deploy to DEV'
+  dependson: Build 
+  condition: succeeded()
+  jobs:
+    - deployment: DeployDev
+      displayName: 'Deploy to DEV Environment'
+      environment: 'Dev'
+      strategy: 
+        runOnce:
+          deploy:
+            steps:
+            -  task: PowerShell@2
+              displayName: 'Deploy to DEV VM's'
+              inputs:
+                targeType: 'inline'
+                script: |
+                  Write-Host "Deploying to DEV"
+                  Write-Host "Files would be deployed to vm-web-1 and vm-web-2"
+
+- stage: DeployStaging
+  displayName: 'Deploy to STAGING'
+  dependsOn: DeployDev
+  condition: succeeded()
+  jobs:
+  - deployment: DeployStaging
+    displayName: 'Deploy to STAGING Environment'
+    environment: 'STAGING'
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          - task: PowerShell@2
+            displayName: 'Deploy to STAGING VMs'
+            inputs: 
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying to STAGING"
+                Write-Host "Files would be deployed to vm-web-1 and vm-web-2"
+
+- stage: DeployProduction
+  displayName: 'Deploy to PRODUCTION'
+  dependsOn: DeployStaging
+  condition: succeeded()
+  jobs: 
+  - deployment: DeployProduction
+    displayName: 'Deploy to PRODUCTION Environment'
+    environment: 'PRODUCTION'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: PowerShell@2
+            displayName: 'Deploy to PRODUCTION VMs'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying to PRODUCTION"
+                Write-Host "Files would be deployed to vm-web-1 and vm-web-2"
+
+
+                
